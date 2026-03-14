@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Admin — NetManager</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#fff;--bg2:#F6F5F2;--bg3:#EDECEA;
+  --tx:#1a1a1a;--tx2:#707070;--tx3:#a0a0a0;
+  --br:rgba(0,0,0,0.09);--br2:rgba(0,0,0,0.17);
+  --red:#E50914;--red2:#c4070f;
+  --green:#0F6E56;--gbg:#E1F5EE;
+  --amber:#854F0B;--abg:#FAEEDA;
+  --blue:#1565C0;--bbg:#E3F2FD;
+  --r:8px;--rl:12px;--rxl:16px;
+  --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'Menlo','Monaco',monospace;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1c1c1e;--bg2:#2a2a2c;--bg3:#111113;--tx:#f0f0f0;--tx2:#a0a0a0;--tx3:#505050;--br:rgba(255,255,255,0.09);--br2:rgba(255,255,255,0.17);--bbg:#0d2a45;--gbg:#085041;--abg:#2e1f00}
+}
+body{font-family:var(--f);background:var(--bg3);color:var(--tx);min-height:100vh}
+.scr{display:none}.scr.on{display:block}
+
+/* ── LOGIN MASTER ── */
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.lb{background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rxl);padding:2rem 1.75rem 1.5rem;width:100%;max-width:320px}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem}
+.logo-n{width:40px;height:40px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;flex-shrink:0}
+.logo-titles{}
+.logo-title{font-size:16px;font-weight:700;color:var(--tx)}
+.logo-sub{font-size:12px;color:var(--tx2)}
+.section-lbl{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;display:block}
+.pw-wrap{position:relative;margin-bottom:.75rem}
+.pw-inp{width:100%;padding:11px 42px 11px 12px;border-radius:var(--r);border:0.5px solid var(--br2);font-family:var(--f);font-size:14px;color:var(--tx);background:var(--bg)}
+.pw-inp:focus{outline:none;border-color:var(--red)}
+.pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:transparent;cursor:pointer;font-size:15px;color:var(--tx3);padding:4px}
+.login-btn{width:100%;padding:11px;border-radius:var(--r);border:none;background:var(--red);color:#fff;font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-bottom:.6rem}
+.login-btn:active{background:var(--red2)}
+.login-err{font-size:12px;color:#A32D2D;min-height:18px;text-align:center}
+.first-setup-note{font-size:12px;color:var(--tx3);text-align:center;margin-top:.75rem;line-height:1.5}
+.first-setup-note strong{color:var(--tx2)}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--br);height:52px;padding:0 1rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-ico{width:26px;height:26px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700}
+.brand-wrap{}
+.brand-title{font-size:14px;font-weight:600;color:var(--tx)}
+.brand-sub{font-size:11px;color:var(--tx2)}
+.topright{display:flex;align-items:center;gap:6px}
+.sync-pill{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx3);background:var(--bg2);padding:4px 9px;border-radius:20px;border:0.5px solid var(--br)}
+.sdot{width:6px;height:6px;border-radius:50%;background:#639922;flex-shrink:0}
+.sdot.sync{background:#EF9F27;animation:pulse 1s infinite}
+.sdot.err{background:#E24B4A}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.logout-btn{padding:6px 13px;border-radius:var(--r);border:0.5px solid var(--br2);background:transparent;font-family:var(--f);font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer}
+.logout-btn:active{background:var(--bg2)}
+
+/* ── MAIN ── */
+.wrap{padding:1.25rem;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:1rem}
+
+/* section cards */
+.sec{background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rl);overflow:hidden}
+.sec-head{padding:.9rem 1.1rem;border-bottom:0.5px solid var(--br);display:flex;align-items:center;gap:.6rem}
+.sec-icon{width:32px;height:32px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sec-icon.blue{background:var(--bbg)}
+.sec-icon.green{background:var(--gbg)}
+.sec-icon.amber{background:var(--abg)}
+.sec-icon.red{background:#FCEBEB}
+.sec-title{font-size:14px;font-weight:600;color:var(--tx)}
+.sec-desc{font-size:12px;color:var(--tx2);margin-top:1px}
+.sec-body{padding:1rem 1.1rem}
+
+/* status display */
+.status-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem .85rem;background:var(--bg2);border-radius:var(--r);margin-bottom:.85rem}
+.status-lbl{font-size:12px;color:var(--tx2)}
+.status-val{font-size:13px;font-weight:600;color:var(--tx);font-family:var(--mono)}
+.status-val.set{color:var(--green)}
+.status-val.unset{color:var(--tx3)}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.status-dot.green{background:#639922}
+.status-dot.gray{background:var(--tx3)}
+
+/* form elements */
+.fg{margin-bottom:.75rem}
+.flbl{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;display:block}
+.finput-wrap{position:relative}
+.finput{width:100%;padding:10px 42px 10px 11px;border-radius:var(--r);border:0.5px solid var(--br2);font-family:var(--f);font-size:14px;color:var(--tx);background:var(--bg)}
+.finput:focus{outline:none;border-color:var(--red)}
+.finput.plain{padding-right:11px}
+.feye{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--tx3);padding:3px}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.submit-btn{width:100%;padding:11px;border-radius:var(--r);border:none;background:var(--red);color:#fff;font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:.25rem}
+.submit-btn:active{background:var(--red2)}
+.submit-btn.green{background:var(--green)}
+.submit-btn.green:active{background:#085041}
+.submit-btn.blue{background:var(--blue)}
+.submit-btn.blue:active{background:#0d47a1}
+.result-msg{font-size:13px;padding:.55rem .85rem;border-radius:var(--r);margin-top:.6rem;display:none;font-weight:500}
+.result-msg.ok{background:var(--gbg);color:var(--green);display:block}
+.result-msg.err{background:#FCEBEB;color:#A32D2D;display:block}
+
+/* PIN display */
+.pin-display{display:flex;gap:12px;justify-content:center;margin:.5rem 0 1rem}
+.pin-dot-d{width:14px;height:14px;border-radius:50%;background:var(--red);display:inline-block}
+
+/* info note */
+.note{font-size:12px;color:var(--tx2);background:var(--bg2);border-radius:var(--r);padding:.65rem .9rem;line-height:1.6;margin-bottom:.75rem}
+.note strong{color:var(--tx)}
+.note.warn{background:var(--abg);color:var(--amber)}
+.note.warn strong{color:var(--amber)}
+
+/* nav links */
+.nav-links{display:flex;gap:8px;flex-wrap:wrap}
+.nav-link{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:var(--r);border:0.5px solid var(--br2);background:var(--bg2);font-family:var(--f);font-size:13px;font-weight:600;color:var(--tx);text-decoration:none;transition:all .15s;flex:1;min-width:140px;justify-content:center}
+.nav-link:active{background:var(--bg3)}
+.nav-link-icon{font-size:16px}
+
+/* numpad for new PIN */
+.pinpad-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.pindots{display:flex;gap:12px;justify-content:center}
+.pindot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--br2);transition:all .12s}
+.pindot.on{background:var(--red);border-color:var(--red)}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pindot.sh{animation:sh .3s}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:100%;max-width:240px}
+.nk{padding:12px;border-radius:var(--r);border:0.5px solid var(--br);background:var(--bg2);font-family:var(--f);font-size:17px;font-weight:500;color:var(--tx);cursor:pointer;transition:all .12s;text-align:center}
+.nk:active{transform:scale(.93)}
+.nk.del{font-size:13px;color:var(--tx2)}
+.nk.blank{border:none;background:transparent;pointer-events:none}
+.pin-step-label{font-size:12px;color:var(--tx2);text-align:center}
+.pin-err{font-size:12px;color:#A32D2D;min-height:16px;text-align:center}
+.pin-save-btn{width:100%;max-width:240px;padding:10px;border-radius:var(--r);border:none;background:var(--green);color:#fff;font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;display:none}
+
+/* toast */
+.toast{position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%);padding:.6rem 1.4rem;background:#0F6E56;color:#fff;font-size:13px;font-weight:600;border-radius:20px;z-index:999;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- MASTER LOGIN -->
+<div id="s-login" class="scr on">
+  <div class="lw">
+    <div class="lb">
+      <div class="logo-row">
+        <div class="logo-n">N</div>
+        <div class="logo-titles">
+          <div class="logo-title">Admin Panel</div>
+          <div class="logo-sub">NetManager · Akses Owner</div>
+        </div>
+      </div>
+
+      <span class="section-lbl">Password Master</span>
+      <div class="pw-wrap">
+        <input class="pw-inp" type="password" id="master-inp" placeholder="Masukkan password master..." onkeydown="if(event.key==='Enter')submitMaster()">
+        <button class="pw-eye" onclick="toggleMasterEye()">&#128065;</button>
+      </div>
+      <button class="login-btn" onclick="submitMaster()">Masuk sebagai Owner</button>
+      <div class="login-err" id="master-err"></div>
+      <div class="first-setup-note" id="setup-note" style="display:none">
+        Belum ada password master.<br>
+        <strong>Masukkan password baru</strong> untuk membuat akun owner pertama kali.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="s-admin" class="scr">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-ico">N</div>
+      <div class="brand-wrap">
+        <div class="brand-title">Admin Panel</div>
+        <div class="brand-sub">Masuk sebagai Owner</div>
+      </div>
+    </div>
+    <div class="topright">
+      <div class="sync-pill"><div class="sdot" id="sdot"></div><span id="slbl">...</span></div>
+      <button class="logout-btn" onclick="logout()">&#128274; Keluar</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- Status section -->
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-icon blue">&#128202;</div>
+        <div>
+          <div class="sec-title">Status Sistem</div>
+          <div class="sec-desc">Kondisi PIN dan password saat ini</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="status-row">
+          <span class="status-lbl">PIN Karyawan</span>
+          <span class="status-val set" id="st-pin">&#9679; Aktif</span>
+        </div>
+        <div class="status-row">
+          <span class="status-lbl">Password Master</span>
+          <span class="status-val set">&#9679; Aktif</span>
+        </div>
+        <div class="note">
+          <strong>PIN Karyawan</strong> dipakai untuk login ke <code>index.html</code> dan <code>laporan.html</code>.<br>
+          <strong>Password Master</strong> hanya untuk halaman admin ini.
+        </div>
+        <div class="nav-links">
+          <a class="nav-link" href="index.html"><span class="nav-link-icon">&#127968;</span> Buka NetManager</a>
+          <a class="nav-link" href="laporan.html"><span class="nav-link-icon">&#128202;</span> Buka Laporan</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ganti PIN -->
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-icon blue">&#128273;</div>
+        <div>
+          <div class="sec-title">Ganti PIN Karyawan</div>
+          <div class="sec-desc">PIN baru langsung berlaku di semua halaman</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="note">PIN saat ini ditampilkan sebagai titik untuk keamanan. Buat PIN 4 digit baru di bawah.</div>
+        <div class="pinpad-wrap">
+          <div class="pin-step-label" id="pin-step-lbl">Masukkan PIN baru (4 digit)</div>
+          <div class="pindots">
+            <div class="pindot" id="pp0"></div>
+            <div class="pindot" id="pp1"></div>
+            <div class="pindot" id="pp2"></div>
+            <div class="pindot" id="pp3"></div>
+          </div>
+          <div class="numpad">
+            <button class="nk" onclick="pinPad('1')">1</button><button class="nk" onclick="pinPad('2')">2</button><button class="nk" onclick="pinPad('3')">3</button>
+            <button class="nk" onclick="pinPad('4')">4</button><button class="nk" onclick="pinPad('5')">5</button><button class="nk" onclick="pinPad('6')">6</button>
+            <button class="nk" onclick="pinPad('7')">7</button><button class="nk" onclick="pinPad('8')">8</button><button class="nk" onclick="pinPad('9')">9</button>
+            <div class="nk blank"></div><button class="nk" onclick="pinPad('0')">0</button><button class="nk del" onclick="pinBack()">&#9003;</button>
+          </div>
+          <div class="pin-err" id="pin-err"></div>
+          <button class="pin-save-btn" id="pin-save-btn" onclick="saveNewPIN()">&#10003; Simpan PIN Baru</button>
+        </div>
+        <div class="result-msg" id="pin-result"></div>
+      </div>
+    </div>
+
+    <!-- Ganti Password Master -->
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-icon amber">&#128272;</div>
+        <div>
+          <div class="sec-title">Ganti Password Master</div>
+          <div class="sec-desc">Hanya owner yang perlu tahu password ini</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="note warn"><strong>Penting:</strong> Simpan password master di tempat yang aman. Jika lupa, reset manual via Firebase Console.</div>
+        <div class="fg">
+          <label class="flbl">Password master saat ini</label>
+          <div class="finput-wrap">
+            <input class="finput" type="password" id="old-master" placeholder="Password lama...">
+            <button class="feye" onclick="toggleEye('old-master',this)">&#128065;</button>
+          </div>
+        </div>
+        <div class="frow2">
+          <div class="fg">
+            <label class="flbl">Password baru</label>
+            <div class="finput-wrap">
+              <input class="finput" type="password" id="new-master" placeholder="Password baru...">
+              <button class="feye" onclick="toggleEye('new-master',this)">&#128065;</button>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Konfirmasi password</label>
+            <div class="finput-wrap">
+              <input class="finput" type="password" id="confirm-master" placeholder="Ulangi...">
+              <button class="feye" onclick="toggleEye('confirm-master',this)">&#128065;</button>
+            </div>
+          </div>
+        </div>
+        <button class="submit-btn amber" style="background:var(--amber)" onclick="changeMasterPw()">Ganti Password Master</button>
+        <div class="result-msg" id="pw-result"></div>
+      </div>
+    </div>
+
+    <!-- Panduan reset darurat -->
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-icon red">&#9888;</div>
+        <div>
+          <div class="sec-title">Reset Darurat (Lupa Password Master)</div>
+          <div class="sec-desc">Jika tidak bisa masuk sama sekali</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="note">Jika lupa password master dan tidak bisa masuk ke admin panel, lakukan reset manual melalui Firebase Console:</div>
+        <ol style="font-size:13px;color:var(--tx2);line-height:2;padding-left:1.25rem">
+          <li>Buka <strong style="color:var(--tx)">console.firebase.google.com</strong></li>
+          <li>Pilih project <strong style="color:var(--tx)">netflix-manager-c1fcd</strong></li>
+          <li>Klik <strong style="color:var(--tx)">Realtime Database</strong></li>
+          <li>Navigasi ke <code style="background:var(--bg2);padding:1px 5px;border-radius:4px">config/</code></li>
+          <li>Hapus nilai <code style="background:var(--bg2);padding:1px 5px;border-radius:4px">pin</code> dan <code style="background:var(--bg2);padding:1px 5px;border-radius:4px">masterPw</code></li>
+          <li>Buka kembali <code style="background:var(--bg2);padding:1px 5px;border-radius:4px">admin.html</code> — sistem akan meminta setup ulang</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCifHEDd3iHUAxSd8PkBj02LAf-Z-f21BU",
+  authDomain:"netflix-manager-c1fcd.firebaseapp.com",
+  databaseURL:"https://netflix-manager-c1fcd-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"netflix-manager-c1fcd",
+  storageBucket:"netflix-manager-c1fcd.firebasestorage.app",
+  messagingSenderId:"670235211618",
+  appId:"1:670235211618:web:65b6f66de2a1e9e20a9e3b"
+});
+const db = firebase.database();
+
+// ── State ──────────────────────────────────────────────────────
+let masterEyeOn=false;
+let pinBuf='', pinStep=1, pinPending='';  // step 1=input, 2=confirm
+
+// ── Sync UI ───────────────────────────────────────────────────
+function ssUI(s,l){const d=document.getElementById('sdot'),lb=document.getElementById('slbl');if(!d)return;d.className='sdot'+(s==='sync'?' sync':s==='err'?' err':'');lb.textContent=l;}
+
+// ── Simple hash (SHA-256 via Web Crypto) ──────────────────────
+async function hashPw(pw){
+  const enc=new TextEncoder();
+  const buf=await crypto.subtle.digest('SHA-256',enc.encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Init: check if master pw exists ──────────────────────────
+async function init(){
+  ssUI('sync','Menghubungkan...');
+  try{
+    const snap=await db.ref('config/masterPw').once('value');
+    if(!snap.val()){
+      // first time setup
+      document.getElementById('setup-note').style.display='block';
+      document.getElementById('master-inp').placeholder='Buat password master baru...';
+    }
+    ssUI('ok','Tersambung');
+  }catch(e){ssUI('err','Gagal terhubung');}
+}
+
+function toggleMasterEye(){
+  masterEyeOn=!masterEyeOn;
+  const inp=document.getElementById('master-inp');
+  inp.type=masterEyeOn?'text':'password';
+  event.currentTarget.innerHTML=masterEyeOn?'&#128584;':'&#128065;';
+}
+
+async function submitMaster(){
+  const pw=document.getElementById('master-inp').value.trim();
+  const err=document.getElementById('master-err');
+  if(!pw){err.textContent='Masukkan password master';return;}
+
+  ssUI('sync','Memverifikasi...');
+  try{
+    const snap=await db.ref('config/masterPw').once('value');
+    const stored=snap.val();
+
+    if(!stored){
+      // first setup — save new master password
+      if(pw.length<6){err.textContent='Password minimal 6 karakter';ssUI('ok','Tersambung');return;}
+      const hashed=await hashPw(pw);
+      await db.ref('config/masterPw').set(hashed);
+      ssUI('ok','Tersambung');
+      enterAdmin();
+    } else {
+      // verify
+      const hashed=await hashPw(pw);
+      if(hashed===stored){ssUI('ok','Tersambung');enterAdmin();}
+      else{err.textContent='Password salah, coba lagi';ssUI('ok','Tersambung');}
+    }
+  }catch(e){err.textContent='Gagal terhubung, coba lagi';ssUI('err','Gagal');}
+}
+
+function enterAdmin(){
+  document.getElementById('s-login').classList.remove('on');
+  document.getElementById('s-admin').classList.add('on');
+  loadStatus();
+}
+
+function logout(){
+  document.getElementById('master-inp').value='';
+  document.getElementById('master-err').textContent='';
+  document.getElementById('s-admin').classList.remove('on');
+  document.getElementById('s-login').classList.add('on');
+  resetPinPad();
+}
+
+async function loadStatus(){
+  ssUI('sync','Memuat...');
+  try{
+    const snap=await db.ref('config/pin').once('value');
+    const pinEl=document.getElementById('st-pin');
+    if(snap.val()){
+      pinEl.className='status-val set';
+      pinEl.innerHTML='&#9679; Aktif ('+snap.val().length+' digit)';
+    } else {
+      pinEl.className='status-val unset';
+      pinEl.textContent='Belum diatur';
+    }
+    ssUI('ok','Tersambung');
+  }catch(e){ssUI('err','Gagal');}
+}
+
+// ── PIN pad ────────────────────────────────────────────────────
+function pinPad(k){
+  if(pinBuf.length>=4)return;
+  pinBuf+=k;
+  updatePinDots();
+  if(pinBuf.length===4){
+    setTimeout(()=>{
+      if(pinStep===1){
+        pinPending=pinBuf; pinBuf=''; pinStep=2;
+        document.getElementById('pin-step-lbl').textContent='Konfirmasi PIN baru';
+        updatePinDots();
+        document.getElementById('pin-save-btn').style.display='none';
+      } else {
+        if(pinBuf===pinPending){
+          document.getElementById('pin-step-lbl').textContent='PIN cocok — klik simpan';
+          document.getElementById('pin-save-btn').style.display='block';
+          document.getElementById('pin-err').textContent='';
+        } else {
+          pinErr('PIN tidak cocok, ulangi');
+          resetPinPad();
+        }
+      }
+    },150);
+  }
+}
+
+function pinBack(){
+  pinBuf=pinBuf.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-err').textContent='';
+}
+
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    document.getElementById('pp'+i).className='pindot'+(i<pinBuf.length?' on':'');
+  }
+}
+
+function pinErr(m){
+  document.getElementById('pin-err').textContent=m;
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('pp'+i);
+    d.classList.add('sh');setTimeout(()=>d.classList.remove('sh'),350);
+  }
+}
+
+function resetPinPad(){
+  pinBuf=''; pinPending=''; pinStep=1;
+  updatePinDots();
+  document.getElementById('pin-step-lbl').textContent='Masukkan PIN baru (4 digit)';
+  document.getElementById('pin-save-btn').style.display='none';
+  document.getElementById('pin-err').textContent='';
+}
+
+async function saveNewPIN(){
+  if(pinPending.length!==4){pinErr('PIN harus 4 digit');return;}
+  ssUI('sync','Menyimpan...');
+  try{
+    await db.ref('config/pin').set(pinPending);
+    showResult('pin-result','ok','&#10003; PIN baru berhasil disimpan! Semua karyawan perlu menggunakan PIN baru.');
+    toast('PIN berhasil diperbarui');
+    resetPinPad();
+    loadStatus();
+    ssUI('ok','Tersimpan');
+  }catch(e){showResult('pin-result','err','Gagal menyimpan, coba lagi');ssUI('err','Gagal');}
+}
+
+// ── Change master password ─────────────────────────────────────
+async function changeMasterPw(){
+  const oldPw=document.getElementById('old-master').value.trim();
+  const newPw=document.getElementById('new-master').value.trim();
+  const confirmPw=document.getElementById('confirm-master').value.trim();
+
+  if(!oldPw||!newPw||!confirmPw){showResult('pw-result','err','Semua kolom wajib diisi');return;}
+  if(newPw.length<6){showResult('pw-result','err','Password baru minimal 6 karakter');return;}
+  if(newPw!==confirmPw){showResult('pw-result','err','Konfirmasi password tidak cocok');return;}
+
+  ssUI('sync','Memverifikasi...');
+  try{
+    const snap=await db.ref('config/masterPw').once('value');
+    const stored=snap.val();
+    const oldHash=await hashPw(oldPw);
+
+    if(oldHash!==stored){showResult('pw-result','err','Password lama salah');ssUI('ok','Tersambung');return;}
+
+    const newHash=await hashPw(newPw);
+    await db.ref('config/masterPw').set(newHash);
+
+    // clear fields
+    document.getElementById('old-master').value='';
+    document.getElementById('new-master').value='';
+    document.getElementById('confirm-master').value='';
+
+    showResult('pw-result','ok','&#10003; Password master berhasil diperbarui');
+    toast('Password master diperbarui');
+    ssUI('ok','Tersambung');
+  }catch(e){showResult('pw-result','err','Gagal, coba lagi');ssUI('err','Gagal');}
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function toggleEye(inputId,btn){
+  const inp=document.getElementById(inputId);
+  const isPass=inp.type==='password';
+  inp.type=isPass?'text':'password';
+  btn.innerHTML=isPass?'&#128584;':'&#128065;';
+}
+
+function showResult(id,type,msg){
+  const el=document.getElementById(id);
+  el.className='result-msg '+type;
+  el.innerHTML=msg;
+  setTimeout(()=>el.className='result-msg',5000);
+}
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ── Boot ───────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
